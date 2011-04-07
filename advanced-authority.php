@@ -106,7 +106,7 @@ function adv_auth_content($c) {
 				return $c;
 			}
 			 
-			$author=get_author();
+			$author=adv_get_author();
 			//or return no authority message
 			return "<h2 style='color:red;'>问题回答错误！</h2>
 					<p>作者没有向所有人公开日志，如果你想阅读，请联系<a href='".$author['email']."'>".$author['name']."</a>获取答案。</p>";
