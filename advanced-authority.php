@@ -13,7 +13,9 @@ Author URI: http://www.yuhanghome.net
 */
 
 //define the option_name of this plugin
-define('ADV_AUTH_OPT_NAME','adv-auth-keys');
+define('ADV_AUTH_KEY','adv-auth-keys');
+define('ADV_AUTH_NAME','adv-auth-name');
+define('ADV_AUTH_EMAIL','adv-auth-email');
 
 add_action ( 'add_meta_boxes', 'adv_auth_add_box' );
 function adv_auth_add_box() {
@@ -76,8 +78,10 @@ add_action ( 'the_content', 'adv_auth_content' );
 //hook the_content to vertify authority
 function adv_auth_content($c) {
 	global $post;
+
 	$adv_on=get_post_meta($post->ID,'adv-auth-on',true);
 	if($adv_on=='on'){
+
 		$question=get_post_meta($post->ID,'adv-auth-ques',true);
 		$ans_tmp=get_post_meta($post->ID,'adv-auth-ans');	
 		$answers=$ans_tmp[0];
@@ -88,33 +92,45 @@ function adv_auth_content($c) {
 				return $c;
 			}
 			
-			$keys_tmp=get_option(ADV_AUTH_OPT_NAME);
+			$keys_tmp=get_option(ADV_AUTH_KEY);
 			$key_arr=explode('|',$keys_tmp);
 			//if the answer is correct global key, return content
 			if(in_array($user_ans,$key_arr)){
 				return $c;
 			}
 			 
+			$author=get_author();
 			//or return no authority message
 			return "<h2 style='color:red;'>问题回答错误！</h2>
-					<p>作者没有向所有人公开日志，请联系<a href='mailto:abraham1@163.com'>Abraham1@163.com</a>获取答案。</p>";
+					<p>作者没有向所有人公开日志，如果你想阅读，请联系<a href='".$author['email']."'>".$author['name']."</a>获取答案。</p>";
 			
 			
 		}else{
+			$author=adv_get_author();
 			return "<form id='adv-auth-form' method='post'> 
 				<h3>这是一篇受保护的日志，你需要输入下面问题的答案才能查看</h3>
 				<div>问题：".$question."</div>
 				<div>答案：<input name='adv-auth-user-ans' type='text'/></div>
-				<div><input name='submit' value='提交' type='submit'/></div>
+				<div><input autocomplete='off' name='submit' value='提交' type='submit'/></div>
 				</form>
-			    <p>如果你不知道答案但希望阅读，请联系作者<a href='mailto:abraham1@163.com'>Abraham1@163.com</a>获取答案。</p>";
+			    <p>如果你不知道答案但希望阅读，请联系<a href='".$author['email']."'>".$author['name']."</a>获取答案。</p>";
 
 		}
 	}else{
 		return $c;	
 	}
 }
-
+function adv_get_author(){
+	$author_name=get_option(ADV_AUTH_NAME);
+	$author_email=get_option(ADV_AUTH_EMAIL);
+	if(empty($author_name))
+		$author_name="作者";
+	if(empty($author_email))
+		$author_email='#';
+	else
+		$author_email='mailto:'.$author_email;
+	return array('name'=>$author_name,'email'=>$author_email);
+}
 add_action ( 'admin_menu', 'my_plugin_menu' );
 
 define ( "OPT_PRE", "adv-auth-" );

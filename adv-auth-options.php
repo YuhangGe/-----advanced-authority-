@@ -2,20 +2,49 @@
 <div class="wrap">
 	<h2>日志保护插件配置</h2>
 <?php 
-	$opt_name=ADV_AUTH_OPT_NAME;//defined in advanced-authority.php
-	if(isset($_POST[$opt_name])){
-		$opt_val=$_POST[$opt_name];
-		if(!empty($opt_val)){
-			update_option($opt_name,$opt_val);
+	$opt_key_name=ADV_AUTH_KEY;//defined in advanced-authority.php
+	$opt_name_name=ADV_AUTH_NAME;
+	$opt_email_name=ADV_AUTH_EMAIL;
+	
+	if(isset($_POST[$opt_key_name]) 
+		&& isset($_POST[$opt_name_name])
+		&& isset($_POST[$opt_email_name])){
+		
+		$opt_key_val=$_POST[$opt_key_name];
+		$opt_name_val=$_POST[$opt_name_name];
+		$opt_email_val=$_POST[$opt_email_name];
+		
+		if(!empty($opt_key_val)
+			&& !empty($opt_name_val)
+			&& !empty($opt_email_val)){
+			update_option($opt_key_name,$opt_key_val);
+			update_option($opt_name_name,$opt_name_val);
+			update_option($opt_email_name,$opt_email_val);
 			echo '<p style=\'color:green;\'>设置已更新</p>';
 		}
 	}
-	$opt_val=get_option($opt_name);
-	$key_arr=explode('|',$opt_val);
+	$opt_key_val=get_option($opt_key_name);
+	$opt_name_val=get_option($opt_name_name);
+	$opt_email_val=get_option($opt_email_name);
+	
+	$key_arr=explode('|',$opt_key_val);
 
 ?>
+	<form action="" method="post">
+	<p>在此处修改个人信息，这些信息显示在日志受保护时的页面，游客可以通过这些信息联系你获得查看日志权限</p>
+	<table>
+			<tr>
+				<td>姓名：</td>
+				<td><input style='width:100%;' type='text' name='<?php echo $opt_name_name;?>' value='<?php echo $opt_name_val;?>'/></td>
+			</tr>
+			<tr>
+				<td>邮箱：</td>
+				<td><input style='width:100%;' type='text' name='adv-auth-email' value='<?php echo $opt_email_val;?>'/></td>
+			</tr>
+		</table>
+		
 
-	<p>你可以在下方添加全局访问口令，这些口令可以用来回答所有问题，也就是用这些口令可以查看所有受保护的日志</p>
+	<p>在下方添加全局访问口令，这些口令可以用来回答所有问题，也就是用这些口令可以查看所有受保护的日志</p>
 	<div>
 		<style>
 			table td{
@@ -48,11 +77,12 @@
 		
 	</div>
 	<div style='padding-left:5px;'>
-		<form action="" method="post">
-			<input id='adv-auth-keys' type='hidden' name='adv-auth-keys' value='<?php echo $opt_val;?>'/>
+	
+			<input id='adv-auth-keys' type='hidden' name='<?php echo $opt_key_name;?>' value='<?php echo $opt_key_val;?>'/>
 			<input type="submit" name="submit" value="保存设置"/>
-		</form>
+		
 	</div>
+	</form>
 </div>
 <script type="text/javascript">
 	AUTO_KEY_ID=<?php echo $key_id;?>;
