@@ -105,7 +105,9 @@ function adv_auth_content($c) {
 			if(in_array($user_ans,$key_arr)){
 				return $c;
 			}
-			 
+			
+			//disable comment
+			$post->comment_status='close';
 			$author=adv_get_author();
 			//or return no authority message
 			return "<h2 style='color:red;'>问题回答错误！</h2>
@@ -113,6 +115,8 @@ function adv_auth_content($c) {
 			
 			
 		}else{
+			//disable comment
+			$post->comment_status='close';
 			$author=adv_get_author();
 			return "<form id='adv-auth-form' method='post'> 
 				<h3>这是一篇受保护的日志，你需要输入下面问题的答案才能查看</h3>
