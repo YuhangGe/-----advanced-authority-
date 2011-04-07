@@ -87,7 +87,6 @@ add_action ( 'the_content', 'adv_auth_content' );
 //hook the_content to vertify authority
 function adv_auth_content($c) {
 	global $post, $current_user, $adv_auth_passed;
-	//print_r(get_defined_vars());
 	$adv_on=get_post_meta($post->ID,'adv-auth-on',true);
 	if($adv_on=='on'){
 		
@@ -141,6 +140,7 @@ function adv_auth_content($c) {
 
 		}
 	}else{
+		$adv_auth_passed=true;
 		return $c;	
 	}
 }
