@@ -6,11 +6,14 @@
 /*
 Plugin Name: 日志保护
 Plugin URI: http://wordpress.org/extend/plugins/advance-authority/
-Description: 高级日志权限管理，可以设置日志查看密码，查看回答问题等。
+Description: 日志保护插件，可以设置日志查看需要回答的问题（密码），问题答案可以有多个。同时可以设置全局口令可用于回答所有问题。
 Author: Abraham
 Version: 1.0
 Author URI: http://www.yuhanghome.net
 */
+
+//define the option_name of this plugin
+define('ADV_AUTH_OPT_NAME','adv-auth-keys');
 
 add_action ( 'add_meta_boxes', 'adv_auth_add_box' );
 function adv_auth_add_box() {
@@ -30,7 +33,7 @@ function adv_auth_save_post($post_id) {
 	if (! current_user_can ( 'edit_post', $post_id ))
 		return $post_id;
 	
-		// verify if this is an auto save routine. 
+	// verify if this is an auto save routine. 
 	// If it is our form has not been submitted, so we dont want to do anything
 	if (defined ( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE)
 		return $post_id;
@@ -62,21 +65,15 @@ function adv_auth_save_post($post_id) {
 		update_post_meta($post_id,'adv-auth-on','off');
 	}
 	
-	//var_dump($adv_auth_on);
-	//var_dump($adv_auth_ques);
-	//var_dump($adv_auth_ans);
-		// $mydata = $_POST['myplugin_new_field'];
-	
-
-	// Do something with $mydata 
-	// probably using add_post_meta(), update_post_meta(), or 
-	// a custom table (see Further Reading section below)
-	
 
 	return $post_id;
 }
 
 add_action ( 'the_content', 'adv_auth_content' );
+
+
+
+//hook the_content to vertify authority
 function adv_auth_content($c) {
 	global $post;
 	$adv_on=get_post_meta($post->ID,'adv-auth-on',true);
@@ -86,12 +83,22 @@ function adv_auth_content($c) {
 		$answers=$ans_tmp[0];
 		if(isset($_POST['adv-auth-user-ans'])){
 			$user_ans=$_POST['adv-auth-user-ans'];
+			//if the answer is correct, return content
 			if(in_array($user_ans,$answers)){
 				return $c;
-			}else{
-				return "<h2 style='color:red;'>问题回答错误！</h2>
-					<p>作者没有向所有人公开日志，请联系<a href='mailto:abraham1@163.com'>Abraham1@163.com</a>获取答案。</p>";
 			}
+			
+			$keys_tmp=get_option(ADV_AUTH_OPT_NAME);
+			$key_arr=explode('|',$keys_tmp);
+			//if the answer is correct global key, return content
+			if(in_array($user_ans,$key_arr)){
+				return $c;
+			}
+			 
+			//or return no authority message
+			return "<h2 style='color:red;'>问题回答错误！</h2>
+					<p>作者没有向所有人公开日志，请联系<a href='mailto:abraham1@163.com'>Abraham1@163.com</a>获取答案。</p>";
+			
 			
 		}else{
 			return "<form id='adv-auth-form' method='post'> 
