@@ -27,8 +27,10 @@
 	$opt_name_val=get_option($opt_name_name);
 	$opt_email_val=get_option($opt_email_name);
 	
-	$key_arr=explode('|',$opt_key_val);
-
+	if(!empty($opt_key_val))
+		$key_arr=explode('|',$opt_key_val);
+	else
+		$key_arr=array();
 ?>
 	<form action="" method="post">
 	<p>在此处修改个人信息，这些信息显示在日志受保护时的页面，游客可以通过这些信息联系你获得查看日志权限</p>
