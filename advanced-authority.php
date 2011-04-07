@@ -71,14 +71,23 @@ function adv_auth_save_post($post_id) {
 	return $post_id;
 }
 
+$adv_auth_passed=false;
+
+add_filter('comments_array','adv_auth_comments');
+function adv_auth_comments($arr) {
+	global $adv_auth_passed;
+	if($adv_auth_passed)
+		return $arr;
+	else
+		return array();
+}
+
 add_action ( 'the_content', 'adv_auth_content' );
-
-
 
 //hook the_content to vertify authority
 function adv_auth_content($c) {
-	global $post, $current_user;
-
+	global $post, $current_user, $adv_auth_passed;
+	//print_r(get_defined_vars());
 	$adv_on=get_post_meta($post->ID,'adv-auth-on',true);
 	if($adv_on=='on'){
 		
@@ -96,6 +105,7 @@ function adv_auth_content($c) {
 			$user_ans=$_POST['adv-auth-user-ans'];
 			//if the answer is correct, return content
 			if(in_array($user_ans,$answers)){
+				$adv_auth_passed=true;
 				return $c;
 			}
 			
@@ -103,11 +113,13 @@ function adv_auth_content($c) {
 			$key_arr=explode('|',$keys_tmp);
 			//if the answer is correct global key, return content
 			if(in_array($user_ans,$key_arr)){
+				$adv_auth_passed=true;
 				return $c;
 			}
 			
 			//disable comment
 			$post->comment_status='close';
+	
 			$author=adv_get_author();
 			//or return no authority message
 			return "<h2 style='color:red;'>问题回答错误！</h2>
@@ -117,6 +129,7 @@ function adv_auth_content($c) {
 		}else{
 			//disable comment
 			$post->comment_status='close';
+
 			$author=adv_get_author();
 			return "<form id='adv-auth-form' method='post'> 
 				<h3>这是一篇受保护的日志，你需要输入下面问题的答案才能查看</h3>
