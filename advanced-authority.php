@@ -86,7 +86,7 @@ add_action ( 'the_content', 'adv_auth_content' );
 
 //hook the_content to vertify authority
 function adv_auth_content($c) {
-	global $post, $current_user, $adv_auth_passed;
+	global $post, $current_user,$adv_auth_passed;
 	$adv_on=get_post_meta($post->ID,'adv-auth-on',true);
 	if($adv_on=='on'){
 		
@@ -98,13 +98,20 @@ function adv_auth_content($c) {
 		}
 		
 		$question=get_post_meta($post->ID,'adv-auth-ques',true);
-		$ans_tmp=get_post_meta($post->ID,'adv-auth-ans');	
-		$answers=$ans_tmp[0];
-		if(isset($_POST['adv-auth-user-ans'])){
-			$user_ans=$_POST['adv-auth-user-ans'];
+		
+		if(isset($_POST['adv-auth-user-ans'])
+		 || isset($_COOKIE['adv-auth-user-ans'])){
+			
+			$ans_tmp=get_post_meta($post->ID,'adv-auth-ans');	
+			$answers=$ans_tmp[0];
+			if(isset($_POST['adv-auth-user-ans']))
+				$user_ans=$_POST['adv-auth-user-ans'];
+			else
+				$user_ans=$_COOKIE['adv-auth-user-ans'];
+			
 			//if the answer is correct, return content
 			if(in_array($user_ans,$answers)){
-				$adv_auth_passed=true;
+				adv_set_passed($user_ans);
 				return $c;
 			}
 			
@@ -112,7 +119,7 @@ function adv_auth_content($c) {
 			$key_arr=explode('|',$keys_tmp);
 			//if the answer is correct global key, return content
 			if(in_array($user_ans,$key_arr)){
-				$adv_auth_passed=true;
+				adv_set_passed($user_ans);
 				return $c;
 			}
 			
@@ -143,6 +150,11 @@ function adv_auth_content($c) {
 		$adv_auth_passed=true;
 		return $c;	
 	}
+}
+function adv_set_passed($ans){
+	global $adv_auth_passed;
+	$adv_auth_passed=true;
+	setcookie('adv-auth-user-ans',$ans,time()+3600*24*7);
 }
 function adv_get_author(){
 	$author_name=get_option(ADV_AUTH_NAME);
