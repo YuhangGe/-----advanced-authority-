@@ -77,11 +77,18 @@ add_action ( 'the_content', 'adv_auth_content' );
 
 //hook the_content to vertify authority
 function adv_auth_content($c) {
-	global $post;
+	global $post, $current_user;
 
 	$adv_on=get_post_meta($post->ID,'adv-auth-on',true);
 	if($adv_on=='on'){
-
+		
+		//first, check if this post was written by current user
+		get_currentuserinfo();
+		$a_id=$post->post_author;
+		if($current_user!=null && $a_id==$current_user->ID){
+			return $c;
+		}
+		
 		$question=get_post_meta($post->ID,'adv-auth-ques',true);
 		$ans_tmp=get_post_meta($post->ID,'adv-auth-ans');	
 		$answers=$ans_tmp[0];
