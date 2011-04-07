@@ -1,0 +1,11 @@
+项目名：	日志保护（Advanced Authority）
+开发者：	Abraham
+邮箱：		abraham1@163.com | abeyuhang@gmail.com
+博客：  	http://www.yuhanghome.net
+新浪微博：	http://weibo.com/abeyuhang
+地址：		Software Institute, Nanjing University, China
+
+项目说明：
+	WordPress插件，用于保护日志。发布日志时可以设定该日志查看时需要回答的问题，问题的答案可以有多个，通过“|”隔开。
+	同时，可以在全局配置通过答案（密码），该答案可以用于任何问题的回答。
+	目前的功能只有这些，如果你有其它好的想法，欢迎联系我~~~
