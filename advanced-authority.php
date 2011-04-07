@@ -12,6 +12,14 @@ Version: 1.0
 Author URI: http://www.yuhanghome.net
 */
 
+//start buffer, because home page will display recent posts so 'adv_auth_content' will be called several times,
+//but set_cookies must be called before echo
+//开启缓冲，因为显示home页时会展示最近的几篇日志，adv_auth_content会被多次调用，每次调用会输出一稿日志的内容，
+//但set_cookies必须在任何输出之前调用，于是使用缓冲。如果不这样，会产生Cannot modify header information - headers already sent by错误。
+//参见http://www.cnblogs.com/mustardpeanut/archive/2009/04/24/1442676.html
+ob_start();
+
+
 //define the option_name of this plugin
 define ( 'ADV_AUTH_KEY', 'adv-auth-keys' );
 define ( 'ADV_AUTH_NAME', 'adv-auth-name' );
@@ -106,7 +114,7 @@ function adv_auth_content($c) {
 	
 			if(adv_is_correct($post->ID,$user_ans)==true){
 				$adv_auth_passed = true;
-				echo '<strong>set cookie</strong>';
+				//echo '<strong>set cookie</strong>';
 				setcookie ( $u_ans_name, $user_ans, time () + 3600 * 24 * 2 );
 				return $c;
 			}
@@ -123,7 +131,7 @@ function adv_auth_content($c) {
 			if(isset($_COOKIE[$u_ans_name])==true){
 				$user_ans=$_COOKIE[$u_ans_name];
 				if(adv_is_correct($post->ID,$user_ans)==true){
-					echo '<strong>cookie correct</strong>';
+					//echo '<strong>cookie correct</strong>';
 					$adv_auth_passed = true;
 					return $c;
 				}
